@@ -1,0 +1,65 @@
+package com.example.chromedino;
+
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+
+public class HelloApplication extends Application {
+
+    private GraphicsContext gc;
+    private Land land;
+    public static final int SCREEN_WIDTH = 1200;
+    public static final int SCREEN_HEIGHT = 300;
+    private static final int GROUND_Y = 0;
+    private double speed = 5.0;
+    private int score;
+
+    @Override
+    public void start(Stage stage) throws IOException {
+        Group root = new Group();
+        Canvas canvas = new Canvas(SCREEN_WIDTH, SCREEN_HEIGHT); //canvas stage size
+        root.getChildren().add(canvas);
+
+        gc = canvas.getGraphicsContext2D();
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setWidth(SCREEN_WIDTH);
+        stage.setHeight(SCREEN_HEIGHT);
+        //stage.setFullScreen(true);
+        stage.setTitle("Chrome Dino");
+
+        stage.show(); //show stage
+        //Initialization
+        land = new Land(GROUND_Y, speed,"/land.png");
+        //new GameLoop.start();
+        new AnimationTimer(){
+            @Override
+            public void handle(long now){
+                update();
+                render();
+            }
+        }.start();
+    }
+    private void update(){
+        land.update();
+    }
+
+    private void render(){
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        land.render(gc);
+    }
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
