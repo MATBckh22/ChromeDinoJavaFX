@@ -10,6 +10,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import misc.Controls;
+import misc.Animation;
+import misc.DinoState;
 
 import java.io.IOException;
 
@@ -19,6 +22,8 @@ public class HelloApplication extends Application {
     private Land land;
     private Cactuses cactuses;
     private Clouds clouds;
+    private Dino dino;
+    private Controls controls;
     public static final int SCREEN_WIDTH = 1200;
     public static final int SCREEN_HEIGHT = 300;
     static final int GROUND_Y = 0;
@@ -42,10 +47,14 @@ public class HelloApplication extends Application {
         stage.setTitle("Chrome Dino");
 
         stage.show(); //show stage
+
+        controls = new Controls(scene);
+
         //Initialization
         land = new Land(GROUND_Y, speed,"/land.png");
         cactuses = new Cactuses();
         clouds = new Clouds(speed);
+        dino = new Dino(controls, gc);
         //new GameLoop.start();
         new AnimationTimer(){
             @Override
@@ -62,6 +71,8 @@ public class HelloApplication extends Application {
         if(cactuses.spaceAvailable()){
             cactuses.createCactuses();
         }
+        dino.updateMovement();
+        cactuses.iscollision(dino.getHitBox());
     }
 
     private void render(){
@@ -70,6 +81,9 @@ public class HelloApplication extends Application {
         land.render(gc);
         cactuses.draw(gc);
         clouds.draw(gc);
+        dino.draw();
+        cactuses.drawHitBox(gc);
+        dino.drawHitBox(gc);
     }
 
     public static void main(String[] args) {
