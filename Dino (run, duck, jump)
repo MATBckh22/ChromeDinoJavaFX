@@ -1,0 +1,146 @@
+package application;
+
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import misc1.Controls1;
+import misc1.Animation1;
+import misc1.DinoState1;
+
+import java.io.IOException;
+
+public class Dino2 extends Application {
+
+    private GraphicsContext gc;
+    private Land1 land;
+    private Image dinoJumpImage;
+    private Animation1 dinoRun;
+    private Animation1 dinoDownRun;
+    private Controls1 controls;
+    public static final int SCREEN_WIDTH = 1200;
+    public static final int SCREEN_HEIGHT = 300;
+    private static final int GROUND_DINO = 250;
+    private double speed = 5.0;
+    private double GROUND_Y = 280;
+    private double SPEED_Y = -12; // Adjust as needed
+    private double GRAVITY = 0.4; // Adjust as needed
+
+    private DinoState1 currentState = DinoState1.DINO_RUN;
+
+    private double dinoY = GROUND_DINO;
+    private double speedY = 0;
+    private boolean isJumping = false;
+
+    @Override
+    public void start(Stage stage) throws IOException {
+        Group root = new Group();
+        Canvas canvas = new Canvas(SCREEN_WIDTH, SCREEN_HEIGHT); // canvas stage size
+        root.getChildren().add(canvas);
+
+        gc = canvas.getGraphicsContext2D();
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setWidth(SCREEN_WIDTH);
+        stage.setHeight(SCREEN_HEIGHT);
+        stage.setTitle("Chrome Dino");
+
+        controls = new Controls1(scene);
+
+        stage.show(); // show stage
+        // Initialization
+        land = new Land1(0, speed, "file:///C:/Users/g1507/git/chrome-dino-java/resources/land.png");
+
+        // Initialize dinoRun animation
+        dinoRun = new Animation1(150); // 150 milliseconds for each frame
+        dinoRun.addSprite(new Image("file:///C:/Users/g1507/git/chrome-dino-java/resources/dino-run-1.png"));
+        dinoRun.addSprite(new Image("file:///C:/Users/g1507/git/chrome-dino-java/resources/dino-run-2.png"));
+        dinoRun.start();
+
+        // Initialize dinoDownRun animation
+        dinoDownRun = new Animation1(150);
+        dinoDownRun.addSprite(new Image("file:///C:/Users/g1507/git/chrome-dino-java/resources/dino-down-run-1.png"));
+        dinoDownRun.addSprite(new Image("file:///C:/Users/g1507/git/chrome-dino-java/resources/dino-down-run-2.png"));
+        dinoDownRun.start();
+
+        // Initialize dinoJump image
+        dinoJumpImage = new Image("file:///C:/Users/g1507/git/chrome-dino-java/resources/dino-jump.png");
+
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                update();
+                render();
+            }
+        }.start();
+    }
+
+    private void update() {
+        land.update();
+
+        if (controls.isPressedUp() && !isJumping) {
+            isJumping = true;
+            currentState = DinoState1.DINO_JUMP;
+            speedY = SPEED_Y;
+        }
+
+        if (isJumping) {
+            dinoY += speedY;
+            speedY += GRAVITY;
+
+            if (dinoY >= GROUND_Y) {
+                dinoY = GROUND_DINO;
+                speedY = 0;
+                isJumping = false;
+                currentState = DinoState1.DINO_RUN;
+            }
+        } else if (controls.isPressedDown()) {
+            currentState = DinoState1.DINO_DOWN_RUN;
+        } else {
+            currentState = DinoState1.DINO_RUN;
+        }
+
+        // Update the appropriate animation
+        if (currentState == DinoState1.DINO_RUN) {
+            dinoRun.updateSprite();
+        } else if (currentState == DinoState1.DINO_DOWN_RUN) {
+            dinoDownRun.updateSprite();
+        }
+    }
+
+    private void render() {
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        land.render(gc);
+
+        // Render dinosaur animation based on state
+        Image currentDinoImage = null;
+        switch (currentState) {
+            case DINO_RUN:
+                currentDinoImage = dinoRun.getSprite();
+                break;
+            case DINO_DOWN_RUN:
+                currentDinoImage = dinoDownRun.getSprite();
+                break;
+            case DINO_JUMP:
+                currentDinoImage = dinoJumpImage;
+                break;
+            default:
+                break;
+        }
+
+        if (currentDinoImage != null) {
+            gc.drawImage(currentDinoImage, 100, dinoY - currentDinoImage.getHeight()); // Adjust position as needed
+        }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
