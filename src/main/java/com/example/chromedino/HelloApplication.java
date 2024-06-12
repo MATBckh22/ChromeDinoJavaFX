@@ -17,9 +17,11 @@ public class HelloApplication extends Application {
 
     private GraphicsContext gc;
     private Land land;
+    private Cactuses cactuses;
+    private Clouds clouds;
     public static final int SCREEN_WIDTH = 1200;
     public static final int SCREEN_HEIGHT = 300;
-    private static final int GROUND_Y = 0;
+    static final int GROUND_Y = 0;
     private double speed = 5.0;
     private int score;
 
@@ -35,12 +37,15 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
         stage.setWidth(SCREEN_WIDTH);
         stage.setHeight(SCREEN_HEIGHT);
-        //stage.setFullScreen(true);
+        stage.setFullScreen(false);
+        stage.setResizable(false);
         stage.setTitle("Chrome Dino");
 
         stage.show(); //show stage
         //Initialization
         land = new Land(GROUND_Y, speed,"/land.png");
+        cactuses = new Cactuses();
+        clouds = new Clouds(speed);
         //new GameLoop.start();
         new AnimationTimer(){
             @Override
@@ -52,13 +57,21 @@ public class HelloApplication extends Application {
     }
     private void update(){
         land.update();
+        cactuses.updatePosition();
+        clouds.updatePosition();
+        if(cactuses.spaceAvailable()){
+            cactuses.createCactuses();
+        }
     }
 
     private void render(){
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         land.render(gc);
+        cactuses.draw(gc);
+        clouds.draw(gc);
     }
+
     public static void main(String[] args) {
         launch(args);
     }
