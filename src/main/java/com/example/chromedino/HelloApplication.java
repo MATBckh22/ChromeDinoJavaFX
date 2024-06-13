@@ -23,6 +23,7 @@ public class HelloApplication extends Application {
     private Cactuses cactuses;
     private Clouds clouds;
     private Dino dino;
+    private Birds bird;
     private Controls controls;
     public static final int SCREEN_WIDTH = 1200;
     public static final int SCREEN_HEIGHT = 300;
@@ -55,6 +56,7 @@ public class HelloApplication extends Application {
         cactuses = new Cactuses();
         clouds = new Clouds(speed);
         dino = new Dino(controls, gc);
+        bird = new Birds(speed);
         //new GameLoop.start();
         new AnimationTimer() {
             @Override
@@ -74,6 +76,11 @@ public class HelloApplication extends Application {
         }
         dino.updateMovement();
         cactuses.iscollision(dino.getHitBox());
+        bird.updatePosition();
+        if (bird.spaceAvailable()){
+            bird.createBird();
+        }
+        bird.iscollision(dino.getHitBox());
     }
 
     private void render() {
@@ -85,6 +92,8 @@ public class HelloApplication extends Application {
         dino.draw();
         cactuses.drawHitBox(gc);
         dino.drawHitBox(gc);
+        bird.draw(gc);
+        bird.drawHitbox(gc);
     }
 
     public static void main(String[] args) {
