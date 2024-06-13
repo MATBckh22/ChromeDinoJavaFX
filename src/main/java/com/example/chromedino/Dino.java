@@ -19,9 +19,8 @@ public class Dino {
 
     private static final double GROUND_DINO = 250;
     private static final double GROUND_Y = 280;
-    private static final double SPEED_Y = -12;
-    private static final double GRAVITY = 0.4;
-    private double speed = 5.0;
+    private static final double SPEED_Y = -20;
+    private static final double GRAVITY = 1.3;
 
     private Land land;
     private Controls controls;
@@ -45,13 +44,13 @@ public class Dino {
         this.gc = gc;
 
         // Initialize dinoRun animation
-        dinoRun = new Animation(150); // 150 milliseconds for each frame
+        dinoRun = new Animation(5); // 150 milliseconds for each frame
         dinoRun.addSprite(new Image("dino-run-1.png"));
         dinoRun.addSprite(new Image("dino-run-2.png"));
         dinoRun.start();
 
         // Initialize dinoDownRun animation
-        dinoDownRun = new Animation(150);
+        dinoDownRun = new Animation(5);
         dinoDownRun.addSprite(new Image("dino-down-run-1.png"));
         dinoDownRun.addSprite(new Image("dino-down-run-2.png"));
         dinoDownRun.start();
@@ -63,11 +62,11 @@ public class Dino {
         // Initialize dinoDeadImage image
         dinoDeadImage = new Image("dino-dead.png");
     }
-    public Bounds getHitBox(){
+
+    public Bounds getHitBox() {
         double hitboxY;
         double width, height;
-        System.out.println(currentState);
-        switch (currentState){
+        switch (currentState) {
             case DINO_RUN:
             case DINO_JUMP:
             case DINO_DEAD:
@@ -85,6 +84,7 @@ public class Dino {
         }
         return new BoundingBox(X - HITBOX_RUN[0], hitboxY, width, height);
     }
+
     public void updateMovement() {
         if (controls.isPressedUp() && !isJumping) {
             isJumping = true;
@@ -139,7 +139,7 @@ public class Dino {
         }
     }
 
-    public void drawHitBox(GraphicsContext gc){
+    public void drawHitBox(GraphicsContext gc) {
         gc.setStroke(Color.GREEN);
         gc.setLineWidth(1);
         gc.strokeRect(getHitBox().getMinX(), getHitBox().getMinY(), getHitBox().getWidth(), getHitBox().getHeight());

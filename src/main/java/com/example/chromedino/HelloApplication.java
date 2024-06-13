@@ -27,7 +27,7 @@ public class HelloApplication extends Application {
     public static final int SCREEN_WIDTH = 1200;
     public static final int SCREEN_HEIGHT = 300;
     static final int GROUND_Y = 0;
-    private double speed = 5.0;
+    private double speed = 12.0;
     private int score;
 
     @Override
@@ -51,31 +51,32 @@ public class HelloApplication extends Application {
         controls = new Controls(scene);
 
         //Initialization
-        land = new Land(GROUND_Y, speed,"/land.png");
+        land = new Land(GROUND_Y, speed, "/land.png");
         cactuses = new Cactuses();
         clouds = new Clouds(speed);
         dino = new Dino(controls, gc);
         //new GameLoop.start();
-        new AnimationTimer(){
+        new AnimationTimer() {
             @Override
-            public void handle(long now){
+            public void handle(long now) {
                 update();
                 render();
             }
         }.start();
     }
-    private void update(){
+
+    private void update() {
         land.update();
         cactuses.updatePosition();
         clouds.updatePosition();
-        if(cactuses.spaceAvailable()){
+        if (cactuses.spaceAvailable()) {
             cactuses.createCactuses();
         }
         dino.updateMovement();
         cactuses.iscollision(dino.getHitBox());
     }
 
-    private void render(){
+    private void render() {
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         land.render(gc);
