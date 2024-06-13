@@ -1,0 +1,82 @@
+package application;
+
+import static user_interface1.HelloApplication.SCREEN_WIDTH;
+
+import misc1.Animation1;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class Birds1 {
+
+    private class Bird {
+
+        private double x;
+        private int y;
+        private Animation1 birdFly;
+
+        private Bird(double x, int y, Animation1 birdFly) {
+            this.x = x;
+            this.y = y;
+            this.birdFly = birdFly;
+        }
+
+    }
+    
+    private List<Bird> birds;
+    private double speedX;
+
+    public Birds1(double speedX) {
+        this.speedX = speedX;
+        birds = new ArrayList<Bird>();
+    }
+
+    public void updatePosition() {
+        for (Iterator<Bird> i = birds.iterator(); i.hasNext();) {
+        	Bird bird = i.next();
+            bird.x -= (speedX + speedX / 5);
+            bird.birdFly.updateSprite();
+        }
+    }
+
+    public boolean spaceAvailable() {
+        for (Bird bird : birds) {
+            Image sprite = bird.birdFly.getSprite();
+            if (sprite != null) {
+                if (SCREEN_WIDTH - (bird.x + sprite.getWidth()) < 500) // distanceBetweenEnemies
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean createBird() {
+        if (Math.random() * 100 < 5) {
+            Animation1 birdFly = new Animation1(1000);
+            birdFly.addSprite(new Image("file:///C:/Users/g1507/git/chrome-dino-java/resources/bird-fly-1.png"));
+            birdFly.addSprite(new Image("file:///C:/Users/g1507/git/chrome-dino-java/resources/bird-fly-2.png"));
+            
+            birdFly.start(); // Start the animation
+            
+            birds.add(new Bird(SCREEN_WIDTH, (int) (Math.random() * (196)), birdFly));
+            		//Math.random() * (GROUND_Y - birdFly.getSprite().getHeight())), birdFly));
+            return false;
+        }
+        return true;
+    }
+
+    public void clearBirds() {
+        birds.clear();
+    }
+
+    public void draw(GraphicsContext gc) {
+        for (Bird bird : birds) {
+            Image sprite = bird.birdFly.getSprite();
+            gc.drawImage(sprite, bird.x, bird.y);
+        }
+    }
+}
