@@ -1,0 +1,88 @@
+package manager1;
+
+import application.Birds1;
+import application.Cactuses1;
+import misc1.EnemyType1;
+//import user_interface1.GameScreen1;
+import javafx.geometry.Bounds;
+import javafx.scene.canvas.GraphicsContext;
+
+public class EnemyManager1 {
+	
+	// value by which chance of creating new enemy increasing
+	private static final double PERCENTAGE_INC = 0.0001;
+	private static final double DISTANCE_DEC = -0.005;
+	private static final int MINIMUM_DISTANCE = 250;
+	
+	private double distanceBetweenEnemies = 500; // Initially 750
+	private double cactusesPercentage = 1; // Initially 2
+	private double birdsPercentage = 0.5; // Initially 1
+	
+	private Cactuses1 cactuses;
+	private Birds1 birds;
+	
+	public EnemyManager1(/*GameScreen1 gameScreen*/) {
+		cactuses = new Cactuses1(5, this); // gameScreen.getSpeed()
+		// Initial speed is 12
+		birds = new Birds1(5, this); // gameScreen.getSpeed()
+		// Initial speed is 12
+	}
+	
+	public double getDistanceBetweenEnemies() {
+		return distanceBetweenEnemies;
+	}
+
+	public double getCactusesPercentage() {
+		return cactusesPercentage;
+	}
+
+	public double getBirdsPercentage() {
+		return birdsPercentage;
+	}
+
+	public void updatePosition() {
+		cactusesPercentage += PERCENTAGE_INC;
+		birdsPercentage += PERCENTAGE_INC;
+		if (distanceBetweenEnemies > MINIMUM_DISTANCE) {
+			distanceBetweenEnemies += DISTANCE_DEC;
+		}
+		cactuses.updatePosition();
+		birds.updatePosition();
+		if (cactuses.spaceAvailable() && birds.spaceAvailable()) {
+			// "randomly" choosing new enemy type 
+			EnemyType1 newEnemyType = EnemyType1.values()[(int) (Math.random() * EnemyType1.values().length)];
+			switch (newEnemyType) {
+				case CACTUS:
+					if (cactuses.createCactuses()) {
+						break;
+					}
+				case BIRD:
+					if (birds.createBird()) {
+						break;
+					}
+				default:
+					cactuses.createCactuses();
+					break;
+			}
+		}
+	}
+	
+	public boolean isCollision(Bounds hitBox) {
+		return cactuses.iscollision(hitBox) || birds.iscollision(hitBox);
+	}
+	
+	public void clearEnemy() {
+		cactuses.clearCactuses();
+		birds.clearBirds();
+	}
+	
+	public void draw(GraphicsContext gc) {
+		cactuses.draw(gc);
+		birds.draw(gc);
+	}
+	
+	public void drawHitbox(GraphicsContext gc) {
+		cactuses.drawHitBox(gc);
+		birds.drawHitBox(gc);
+	}
+}
