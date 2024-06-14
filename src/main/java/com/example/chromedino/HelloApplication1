@@ -1,0 +1,124 @@
+package user_interface1;
+
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+//import javafx.scene.image.Image;
+//import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import misc1.Controls1;
+//import misc1.Animation1;
+//import misc1.DinoState1;
+
+import java.io.IOException;
+
+import application.Land1;
+import application.Clouds1;
+//import application.Cactuses1;
+//import application.Birds1;
+import application.Dino1;
+import manager1.EnemyManager1;
+
+public class HelloApplication extends Application {
+
+    private GraphicsContext gc;
+    private Land1 land;
+    //private Cactuses1 cactuses;
+    private Clouds1 clouds;
+    private Dino1 dino;
+    //private Birds1 bird;
+    private Controls1 controls;
+    private EnemyManager1 enemyManager;
+    public static final int SCREEN_WIDTH = 1200;
+    public static final int SCREEN_HEIGHT = 300;
+    static final int GROUND_Y = 0;
+    private double speed = 5.0;
+    //private int score;
+
+    @Override
+    public void start(Stage stage) throws IOException {
+        Group root = new Group();
+        Canvas canvas = new Canvas(SCREEN_WIDTH, SCREEN_HEIGHT); //canvas stage size
+        root.getChildren().add(canvas);
+
+        gc = canvas.getGraphicsContext2D();
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setWidth(SCREEN_WIDTH);
+        stage.setHeight(SCREEN_HEIGHT);
+        stage.setFullScreen(false);
+        stage.setResizable(false);
+        stage.setTitle("Chrome Dino");
+
+        stage.show(); //show stage
+
+        controls = new Controls1(scene);
+
+        //Initialization
+        land = new Land1(GROUND_Y, speed, "land.png");
+        dino = new Dino1(controls, gc);
+        //bird = new Birds1(speed);
+        clouds = new Clouds1(speed);
+        //cactuses = new Cactuses1(speed);
+        enemyManager = new EnemyManager1(); // new GameScreen1()
+        
+        //new GameLoop.start();
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                update();
+                render();
+            }
+        }.start();
+    }
+
+    private void update() {
+        land.update();
+        clouds.updatePosition();
+        enemyManager.updatePosition();
+        dino.updateMovement();
+        if (enemyManager.isCollision(dino.getHitBox())) {
+            dino.setDead();
+        }
+        /*
+        cactuses.updatePosition();
+        if (cactuses.spaceAvailable()) {
+            cactuses.createCactuses();
+        }
+        cactuses.iscollision(dino.getHitBox());
+        bird.updatePosition();
+        if (bird.spaceAvailable()) {
+			bird.createBird();
+        }
+        bird.iscollision(dino.getHitBox());
+        
+        if (bird.iscollision(dino.getHitBox()) || cactuses.iscollision(dino.getHitBox())) {
+            dino.setDead();
+        }
+        */
+    }
+
+    private void render() {
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        land.render(gc);
+        clouds.draw(gc);
+        enemyManager.draw(gc);
+        enemyManager.drawHitbox(gc);
+        dino.draw();
+        dino.drawHitBox(gc);
+        //cactuses.draw(gc);
+        //cactuses.drawHitBox(gc);
+        //bird.draw(gc);
+        //bird.drawHitBox(gc);
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
