@@ -13,19 +13,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import misc.Animation;
-import misc.Controls;
-import misc.DinoState;
-import misc.GameState;
+import misc.*;
 import com.example.chromedino.Score;
-import misc.EnemyManager;
-import com.example.chromedino.*;
 
 import static com.example.chromedino.HelloApplication.SCREEN_WIDTH;
 import static com.example.chromedino.HelloApplication.SCREEN_HEIGHT;
 
 public class GameScreen extends Canvas {
-    private AnimationTimer animationTimer;
 
     private static final int STARTING_SPEED = -5;
     private static final double DIFFICULTY_INC = -0.0002;
@@ -51,21 +45,37 @@ public class GameScreen extends Canvas {
     private Score score;
     private GraphicsContext gc;
     private EnemyManager eManager;
+    private ControlManager cManager;
 
-    public GameScreen(GraphicsContext gc){
-        //super(scene.getWidth(), scene.getHeight());
+    public GameScreen(Scene scene, GraphicsContext gc){
+        super(scene.getWidth(), scene.getHeight());
         this.gc = gc;
         dino = new Dino(controls, gc);
         land = new Land(GROUND_Y, STARTING_SPEED, "land.png");
         clouds = new Clouds(STARTING_SPEED);
         score = new Score();
+        controls = new Controls(scene);
+        cManager = new ControlManager(controls, this);
+        System.out.println(gameState);
+
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                update();
+                render();
+            }
+        }.start();
+    }
+    private void update(){
         System.out.println(gameState);
         setFocusTraversable(true);
+        cManager.update();
 
         //key binds when start
         setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case UP:
+                    System.out.println("press up initiated");
                     pressUpAction();
                     break;
                 case DOWN:
@@ -77,30 +87,24 @@ public class GameScreen extends Canvas {
                 case D:
                     pressDebugAction();
                     break;
+                default:
+                    break;
             }
         });
 
         setOnKeyReleased(event -> {
             switch (event.getCode()) {
                 case UP:
+                    System.out.println("release up initiated");
                     releaseUpAction();
                     break;
                 case DOWN:
                     releaseDownAction();
                     break;
+                default:
+                    break;
             }
         });
-
-        new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                update();
-                render();
-            }
-        }.start();
-    }
-
-    private void update(){
         switch(gameState){
             case GAME_INTRO:
                 dino.updateMovement();
@@ -134,7 +138,7 @@ public class GameScreen extends Canvas {
     }
 
     private void render(){
-        System.out.println(dino.getDinoState());
+        //System.out.println(dino.getDinoState());
         switch(gameState){
             case GAME_START:
                 startScreen(gc);
@@ -234,6 +238,7 @@ public class GameScreen extends Canvas {
     }
 
     public void pressUpAction(){
+        System.out.println("Pressed up!");
         if(gameState == GameState.GAME_IN_PROGRESS){
             dino.jump();
             dino.setDinoState(DinoState.DINO_JUMP);

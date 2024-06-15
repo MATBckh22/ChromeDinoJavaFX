@@ -11,6 +11,7 @@ import javafx.scene.canvas.GraphicsContext;
 //import javafx.scene.image.ImageView;
 //import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import misc.ControlManager;
 import misc.Controls;
 //import misc.Animation1;
 //import misc.DinoState1;
@@ -27,6 +28,8 @@ import misc.GameState;
 
 public class HelloApplication extends Application {
     private GameScreen gameScreen;
+    private Controls controls;
+    private ControlManager cManager;
     private GraphicsContext gc;
     //private Land land;
     //private Cactuses1 cactuses;
@@ -56,8 +59,9 @@ public class HelloApplication extends Application {
         stage.setHeight(SCREEN_HEIGHT);
         stage.setResizable(false);
         stage.setTitle("Chrome Dino");
+        controls = new Controls(scene);
 
-        new GameScreen(gc);
+        GameScreen gameScreen = new GameScreen(scene, gc);
         stage.show();
     }
 
