@@ -23,6 +23,7 @@ public class GameScreen extends Canvas {
 
     private static final int STARTING_SPEED = -5;
     private static final double DIFFICULTY_INC = -0.0002;
+    private static final int LAND_SPEED = 12;
 
     public static final double GRAVITY = 1.3;
     public static final double SPEED_Y = -20;
@@ -50,12 +51,13 @@ public class GameScreen extends Canvas {
     public GameScreen(Scene scene, GraphicsContext gc){
         super(scene.getWidth(), scene.getHeight());
         this.gc = gc;
+        controls = new Controls(scene);
         dino = new Dino(controls, gc);
-        land = new Land(GROUND_Y, STARTING_SPEED, "land.png");
+        land = new Land(GROUND_Y, LAND_SPEED, "land.png");
         clouds = new Clouds(STARTING_SPEED);
         score = new Score();
-        controls = new Controls(scene);
         cManager = new ControlManager(controls, this);
+        eManager = new EnemyManager();
         System.out.println(gameState);
 
         new AnimationTimer() {
@@ -70,47 +72,13 @@ public class GameScreen extends Canvas {
         System.out.println(gameState);
         setFocusTraversable(true);
         cManager.update();
-
-        //key binds when start
-        setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case UP:
-                    System.out.println("press up initiated");
-                    pressUpAction();
-                    break;
-                case DOWN:
-                    pressDownAction();
-                    break;
-                case P:
-                    pressPauseAction();
-                    break;
-                case D:
-                    pressDebugAction();
-                    break;
-                default:
-                    break;
-            }
-        });
-
-        setOnKeyReleased(event -> {
-            switch (event.getCode()) {
-                case UP:
-                    System.out.println("release up initiated");
-                    releaseUpAction();
-                    break;
-                case DOWN:
-                    releaseDownAction();
-                    break;
-                default:
-                    break;
-            }
-        });
         switch(gameState){
             case GAME_INTRO:
                 dino.updateMovement();
                 if(!introJump && dino.getDinoState() == DinoState.DINO_RUN) land.update();
                 clouds.updatePosition();
                 introCountdown += SpeedX;
+                System.out.println(introCountdown);
                 if(introCountdown <= 0) gameState = GameState.GAME_IN_PROGRESS;
                 if(introJump){
                     dino.jump();
@@ -138,6 +106,8 @@ public class GameScreen extends Canvas {
     }
 
     private void render(){
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         //System.out.println(dino.getDinoState());
         switch(gameState){
             case GAME_START:
@@ -196,6 +166,7 @@ public class GameScreen extends Canvas {
     }
 
     private void inProgressScreen(GraphicsContext gc) {
+        System.out.println("In Progress Screen");
         clouds.draw(gc);
         land.render(gc);
         eManager.draw(gc);
@@ -243,6 +214,7 @@ public class GameScreen extends Canvas {
             dino.jump();
             dino.setDinoState(DinoState.DINO_JUMP);
         }
+        releaseUpAction();
     }
 
     public void releaseUpAction(){
@@ -256,7 +228,7 @@ public class GameScreen extends Canvas {
             dino.resetDino();
             clouds.clearClouds();
             land.resetLand();
-            gameState = GameState.GAME_IN_PROGRESS;
+            gameState = GameState.GAME_START;
         }
     }
 
@@ -265,6 +237,7 @@ public class GameScreen extends Canvas {
         if(dino.getDinoState() != DinoState.DINO_JUMP && gameState == gameState.GAME_IN_PROGRESS){
             dino.setDinoState(DinoState.DINO_DOWN_RUN);
         }
+        releaseDownAction();
     }
 
     //set states, different to controls
