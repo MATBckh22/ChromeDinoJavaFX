@@ -1,0 +1,24 @@
+package manager1;
+
+import misc1.Controls1;
+import user_interface1.GameScreen1;
+
+public class ControlsManager1 {
+
+    private Controls1 controls;
+    private GameScreen1 gameScreen;
+
+    public ControlsManager1(Controls1 controls, GameScreen1 gameScreen) {
+        this.controls = controls;
+        this.gameScreen = gameScreen;
+    }
+
+    public void update() {
+        if (controls.isPressedUp()) {
+            gameScreen.pressUpAction();
+        }
+        if (controls.isPressedDown()) {
+            gameScreen.pressDownAction();
+        }
+    }
+}
