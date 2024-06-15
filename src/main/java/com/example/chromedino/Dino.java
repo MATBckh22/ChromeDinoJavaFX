@@ -5,7 +5,6 @@ import javafx.geometry.Bounds;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import misc.Controls;
 import misc.Animation;
 import misc.DinoState;
@@ -19,10 +18,9 @@ public class Dino {
 
     private static final double GROUND_DINO = 250;
     private static final double GROUND_Y = 280;
-    private static final double SPEED_Y = -20;
-    private static final double GRAVITY = 1.3;
+    private static final double SPEED_Y = -20; // Initially -20 dskd: -12
+    private static final double GRAVITY = 1.3; // Initially 1.3 dskd: 0.4
 
-    private Land land;
     private Controls controls;
     private GraphicsContext gc;
 
@@ -59,7 +57,6 @@ public class Dino {
         dinoJumpImage = new Image("dino-jump.png");
 
         // Initialize dinoDeadImage image
-        // Initialize dinoDeadImage image
         dinoDeadImage = new Image("dino-dead.png");
     }
 
@@ -86,6 +83,10 @@ public class Dino {
     }
 
     public void updateMovement() {
+        if (currentState == DinoState.DINO_DEAD) {
+            return; // Do not update movement if the dino is dead
+        }
+
         if (controls.isPressedUp() && !isJumping) {
             isJumping = true;
             currentState = DinoState.DINO_JUMP;
@@ -118,6 +119,13 @@ public class Dino {
         y = dinoY;
     }
 
+    public void setDead() {
+        currentState = DinoState.DINO_DEAD;
+    }
+    public DinoState getDinoState(){
+        return currentState;
+    }
+
     public void draw() {
         // Render dinosaur animation based on state
         Image currentDinoImage = null;
@@ -131,6 +139,9 @@ public class Dino {
             case DINO_JUMP:
                 currentDinoImage = dinoJumpImage;
                 break;
+            case DINO_DEAD:
+                currentDinoImage = dinoDeadImage;
+                break;
             default:
                 break;
         }
@@ -142,6 +153,28 @@ public class Dino {
     public void drawHitBox(GraphicsContext gc) {
         gc.setStroke(Color.GREEN);
         gc.setLineWidth(1);
-        gc.strokeRect(getHitBox().getMinX(), getHitBox().getMinY(), getHitBox().getWidth(), getHitBox().getHeight());
+        gc.strokeRect(getHitBox().getMinX(),
+                getHitBox().getMinY(), getHitBox().getWidth(), getHitBox().getHeight());
+    }
+    public void setDinoState(DinoState dinoState) {
+        this.currentState = dinoState;
+    }
+
+    public void jump() {
+        if(y == GROUND_Y - dinoRun.getSprite().getHeight()) {
+            speedY = SPEED_Y;
+            y += speedY;
+        }
+    }
+
+    public void resetDino() {
+        y = GROUND_Y - dinoJumpImage.getHeight();
+        currentState = DinoState.DINO_RUN;
+    }
+
+    public void dinoGameOver() {
+        if(y > GROUND_Y - dinoDeadImage.getHeight())
+            y = GROUND_Y - dinoDeadImage.getHeight();
+        currentState = DinoState.DINO_DEAD;
     }
 }

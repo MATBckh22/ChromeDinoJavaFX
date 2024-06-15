@@ -51,4 +51,8 @@ public class Land {
     public void updateSpeed(double newSpeed) {
         this.speed = newSpeed;
     }
+
+    public void resetLand() {
+        x = 0;
+    }
 }

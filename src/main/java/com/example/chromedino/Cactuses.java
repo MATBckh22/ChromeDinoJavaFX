@@ -2,10 +2,11 @@ package com.example.chromedino;
 
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import misc.EnemyManager;
+import com.example.chromedino.HelloApplication;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,7 +17,7 @@ import static com.example.chromedino.HelloApplication.SCREEN_WIDTH;
 
 public class Cactuses {
 
-    //Constructor
+    // Constructor
     private class Cactus {
 
         private Image cactusimage;
@@ -34,14 +35,17 @@ public class Cactuses {
     private static final int MAX_CACTUS_GROUP = 3;
     private static final double HITBOX_X = 2.7;
     private static final int HITBOX_Y = 25;
+
+    private EnemyManager eManager;
     private List<Cactus> cactuses;
     private Random random;
     private double speedX;
 
-    public Cactuses() {
+    public Cactuses(double speedX, EnemyManager eManager) {
+        this.speedX = speedX;
+        this.eManager = eManager;
         cactuses = new ArrayList<>();
         random = new Random();
-        speedX = 12.0;
     }
 
     public void updatePosition() {
@@ -55,14 +59,18 @@ public class Cactuses {
 
     public boolean spaceAvailable() {
         //System.out.println("Checking for space");
-        if (cactuses.isEmpty()) return true;
+        if (cactuses.isEmpty()) {
+            return true;
+        }
         Cactus lastCactus = cactuses.get(cactuses.size() - 1);
-        return HelloApplication.SCREEN_WIDTH - (lastCactus.x + lastCactus.cactusimage.getWidth()) > 200; //distance between cactuses
+        return HelloApplication.SCREEN_WIDTH - (
+                lastCactus.x + lastCactus.cactusimage.getWidth())
+                > eManager.getDistanceBetweenEnemies(); //distance between cactuses
     }
 
     public boolean createCactuses() {
         //generate probability of cactuses spawning to be less than 10% for each
-        if (Math.random() * 100 < 0.5) {
+        if (Math.random() * 100 < eManager.getCactusesPercentage()) {
             int numberofCactuses = (int) (Math.random() * MAX_CACTUS_GROUP + 1);
             for (int i = 0; i < numberofCactuses; i++) {
                 Image cactusimage = new Image("cactus-" + (random.nextInt(CACTUS_AMOUNT) + 1) + ".png");
@@ -83,7 +91,7 @@ public class Cactuses {
         for (Cactus cactus : cactuses) {
             Bounds cactusHitBox = getHitBox(cactus);
             if (cactusHitBox.intersects(dinoHitBox)) {
-                System.out.println("Collision detected!");
+                System.out.println("Cactuses Collision detected!");
                 return true;
             }
         }
@@ -117,7 +125,10 @@ public class Cactuses {
         gc.setLineWidth(1);
         for (Cactus cactus : cactuses) {
             Bounds cactusHitBox = getHitBox(cactus);
-            gc.strokeRect(cactusHitBox.getMinX(), cactusHitBox.getMinY(), cactusHitBox.getWidth(), cactusHitBox.getHeight());
+            gc.strokeRect(cactusHitBox.getMinX(),
+                    cactusHitBox.getMinY(),
+                    cactusHitBox.getWidth(),
+                    cactusHitBox.getHeight());
         }
     }
 }
