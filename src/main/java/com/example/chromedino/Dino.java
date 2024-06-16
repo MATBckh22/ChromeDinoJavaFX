@@ -32,7 +32,7 @@ public class Dino {
     private double dinoY = GROUND_DINO;
     private double speedY = 0;
     private boolean isJumping = false;
-    private DinoState currentState = DinoState.DINO_RUN;
+    private DinoState currentState;
 
     public static final int SCREEN_WIDTH = 1200;
     public static final int SCREEN_HEIGHT = 300;
@@ -58,6 +58,13 @@ public class Dino {
 
         // Initialize dinoDeadImage image
         dinoDeadImage = new Image("dino-dead.png");
+
+        //Initialize dino at jump state
+        currentState = DinoState.DINO_JUMP;
+    }
+
+    public DinoState getDinoState(){
+        return currentState;
     }
 
     public Bounds getHitBox() {
@@ -121,9 +128,6 @@ public class Dino {
 
     public void setDead() {
         currentState = DinoState.DINO_DEAD;
-    }
-    public DinoState getDinoState(){
-        return currentState;
     }
 
     public void draw() {
