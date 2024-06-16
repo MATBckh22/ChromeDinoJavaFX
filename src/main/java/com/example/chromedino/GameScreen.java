@@ -23,7 +23,7 @@ public class GameScreen extends Canvas {
 
     private static final int STARTING_SPEED = -5;
     private static final double DIFFICULTY_INC = -0.0002;
-    private static final int LAND_SPEED = 12;
+    private static final int LAND_SPEED = 15;
 
     public static final double GRAVITY = 1.3;
     public static final double SPEED_Y = -20;
@@ -54,7 +54,7 @@ public class GameScreen extends Canvas {
         controls = new Controls(scene);
         dino = new Dino(controls, gc);
         land = new Land(GROUND_Y, LAND_SPEED, "land.png");
-        clouds = new Clouds(STARTING_SPEED);
+        clouds = new Clouds(LAND_SPEED);
         score = new Score();
         cManager = new ControlManager(controls, this);
         eManager = new EnemyManager();
