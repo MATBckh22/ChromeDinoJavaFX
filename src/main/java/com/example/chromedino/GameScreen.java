@@ -5,6 +5,9 @@ import com.example.chromedino.Cactuses;
 import com.example.chromedino.Clouds;
 import com.example.chromedino.Dino;
 import com.example.chromedino.Land;
+import javafx.scene.control.Skin;
+import javafx.scene.input.MouseEvent;
+import misc.SkinManager;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
@@ -33,7 +36,7 @@ public class GameScreen extends Canvas {
     private final int NS_PER_FRAME = 1_000_000_000 / FPS;
 
     private double SpeedX = STARTING_SPEED;
-    private GameState gameState = GameState.GAME_START;
+    private GameState gameState = GameState.GAME_SKIN;
     private int introCountdown = 1000;
     private boolean introJump = true;
     private boolean showHitBoxes = true;
@@ -47,6 +50,7 @@ public class GameScreen extends Canvas {
     private GraphicsContext gc;
     private EnemyManager eManager;
     private ControlManager cManager;
+    private SkinManager sManager;
 
     public GameScreen(Scene scene, GraphicsContext gc){
         super(scene.getWidth(), scene.getHeight());
@@ -58,6 +62,8 @@ public class GameScreen extends Canvas {
         score = new Score();
         cManager = new ControlManager(controls, this);
         eManager = new EnemyManager();
+        sManager = new SkinManager();
+
         System.out.println(gameState);
 
         new AnimationTimer() {
@@ -67,9 +73,13 @@ public class GameScreen extends Canvas {
                 render();
             }
         }.start();
+
+        scene.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            sManager.handleMouseClick(event, dino);
+        });
     }
     private void update(){
-        System.out.println(gameState);
+        //System.out.println(gameState);
         setFocusTraversable(true);
         cManager.update();
         switch(gameState){
@@ -110,6 +120,9 @@ public class GameScreen extends Canvas {
         gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         //System.out.println(dino.getDinoState());
         switch(gameState){
+            case GAME_SKIN:
+                SkinScreen(gc);
+                break;
             case GAME_START:
                 startScreen(gc);
                 break;
@@ -135,7 +148,16 @@ public class GameScreen extends Canvas {
         dino.drawHitBox(gc);
     }
 
+    private void SkinScreen(GraphicsContext gc){
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        land.render(gc);
+        clouds.draw(gc);
+        sManager.drawSkins(gc);
+        if(sManager.SkinSelected()) gameState = GameState.GAME_START;
+    }
     private void startScreen(GraphicsContext gc) {
+        System.out.println("Start Screen");
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         // Draw land
@@ -228,7 +250,8 @@ public class GameScreen extends Canvas {
             dino.resetDino();
             clouds.clearClouds();
             land.resetLand();
-            gameState = GameState.GAME_START;
+            sManager.skinselected = false;
+            gameState = GameState.GAME_SKIN;
         }
     }
 

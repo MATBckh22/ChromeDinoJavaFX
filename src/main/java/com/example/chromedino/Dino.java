@@ -24,8 +24,6 @@ public class Dino {
     private Controls controls;
     private GraphicsContext gc;
 
-    private Image dinoJumpImage;
-    private Image dinoDeadImage;
     private Animation dinoRun;
     private Animation dinoDownRun;
 
@@ -33,6 +31,13 @@ public class Dino {
     private double speedY = 0;
     private boolean isJumping = false;
     private DinoState currentState;
+
+    private Image dinojump;
+    private Image dinorun1;
+    private Image dinorun2;
+    private Image dinodownrun1;
+    private Image dinodownrun2;
+    private Image dinodead;
 
     public static final int SCREEN_WIDTH = 1200;
     public static final int SCREEN_HEIGHT = 300;
@@ -43,21 +48,9 @@ public class Dino {
 
         // Initialize dinoRun animation
         dinoRun = new Animation(5); // 150 milliseconds for each frame
-        dinoRun.addSprite(new Image("dino-run-1.png"));
-        dinoRun.addSprite(new Image("dino-run-2.png"));
-        dinoRun.start();
 
         // Initialize dinoDownRun animation
         dinoDownRun = new Animation(5);
-        dinoDownRun.addSprite(new Image("dino-down-run-1.png"));
-        dinoDownRun.addSprite(new Image("dino-down-run-2.png"));
-        dinoDownRun.start();
-
-        // Initialize dinoJump image
-        dinoJumpImage = new Image("dino-jump.png");
-
-        // Initialize dinoDeadImage image
-        dinoDeadImage = new Image("dino-dead.png");
 
         //Initialize dino at jump state
         currentState = DinoState.DINO_JUMP;
@@ -126,6 +119,60 @@ public class Dino {
         y = dinoY;
     }
 
+    public void setDinoJumpImage(String DinoJump) {
+        dinojump = new Image(DinoJump);
+        System.out.println(DinoJump);
+    }
+
+    public void setDinoRun1Image(String DinoRun1) {
+        dinorun1 = new Image(DinoRun1);
+        dinoRun.addSprite(dinorun1);  // Add sprite to animation
+    }
+
+    public void setDinoRun2Image(String DinoRun2) {
+        dinorun2 = new Image(DinoRun2);
+        dinoRun.addSprite(dinorun2);  // Add sprite to animation
+    }
+
+    public void setDinoDownRun1Image(String DinoDownRun1) {
+        dinodownrun1 = new Image(DinoDownRun1);
+        dinoDownRun.addSprite(dinodownrun1);  // Add sprite to animation
+    }
+
+    public void setDinoDownRun2Image(String DinoDownRun2) {
+        dinodownrun2 = new Image(DinoDownRun2);
+        dinoDownRun.addSprite(dinodownrun2);  // Add sprite to animation
+    }
+
+    public void setDinoDeadImage(String DinoDead) {
+        dinodead = new Image(DinoDead);
+    }
+
+    public Image getDinoJumpImage(){
+        System.out.println(dinojump);
+        return dinojump;
+    }
+
+    public Image getDinoRun1Image(){
+        return dinorun1;
+    }
+
+    public Image getDinoRun2Image(){
+        return dinorun2;
+    }
+
+    public Image getDinoDownRun1Image(){
+        return dinodownrun1;
+    }
+
+    public Image getDinoDownRun2Image(){
+        return dinodownrun2;
+    }
+
+    public Image getDinoDeadImage(){
+        return dinodead;
+    }
+
     public void setDead() {
         currentState = DinoState.DINO_DEAD;
     }
@@ -141,14 +188,15 @@ public class Dino {
                 currentDinoImage = dinoDownRun.getSprite();
                 break;
             case DINO_JUMP:
-                currentDinoImage = dinoJumpImage;
+                currentDinoImage = dinojump;
                 break;
             case DINO_DEAD:
-                currentDinoImage = dinoDeadImage;
+                currentDinoImage = dinodead;
                 break;
             default:
                 break;
         }
+        System.out.println(currentDinoImage);
         if (currentDinoImage != null) {
             gc.drawImage(currentDinoImage, 100, dinoY - currentDinoImage.getHeight()); // Adjust position as needed
         }
@@ -172,13 +220,13 @@ public class Dino {
     }
 
     public void resetDino() {
-        y = GROUND_Y - dinoJumpImage.getHeight();
+        y = GROUND_Y - dinojump.getHeight();
         currentState = DinoState.DINO_RUN;
     }
 
     public void dinoGameOver() {
-        if(y > GROUND_Y - dinoDeadImage.getHeight())
-            y = GROUND_Y - dinoDeadImage.getHeight();
+        if(y > GROUND_Y - dinodead.getHeight())
+            y = GROUND_Y - dinodead.getHeight();
         currentState = DinoState.DINO_DEAD;
     }
 }
