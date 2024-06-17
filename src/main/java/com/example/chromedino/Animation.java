@@ -46,4 +46,9 @@ public class Animation {
         }
         return null;
     }
+
+    public void clearSprites() {
+        sprites.clear();
+        currentSpriteIndex = 0;
+    }
 }

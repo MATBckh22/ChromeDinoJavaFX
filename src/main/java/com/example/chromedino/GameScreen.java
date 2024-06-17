@@ -163,7 +163,8 @@ public class GameScreen extends Canvas {
         // Draw land
         land.render(gc);
 
-        // Draw dino
+        // Reset and draw dino
+        dino.resetDino();
         dino.draw();
 
         // Load intro image

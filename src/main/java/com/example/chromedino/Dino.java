@@ -126,6 +126,7 @@ public class Dino {
 
     public void setDinoRun1Image(String DinoRun1) {
         dinorun1 = new Image(DinoRun1);
+        dinoRun.clearSprites();
         dinoRun.addSprite(dinorun1);  // Add sprite to animation
     }
 
@@ -136,6 +137,7 @@ public class Dino {
 
     public void setDinoDownRun1Image(String DinoDownRun1) {
         dinodownrun1 = new Image(DinoDownRun1);
+        dinoDownRun.clearSprites();
         dinoDownRun.addSprite(dinodownrun1);  // Add sprite to animation
     }
 
