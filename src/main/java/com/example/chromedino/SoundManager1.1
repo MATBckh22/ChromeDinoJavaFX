@@ -1,0 +1,65 @@
+package manager1;
+
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.application.Platform;
+import java.io.File;
+
+public class SoundManager1 {
+
+    public static int WAITING_TIME = 0;
+
+    private boolean playSound = false;
+    private String path;
+    private MediaPlayer mediaPlayer;
+
+    public SoundManager1(String path) {
+    	//this.path = path;
+    	//Media sound = new Media(new File(path).toURI().toString());
+    	
+    	//path = "file:///C:/Users/g1507/git/chrome-dino-java/resources/jump.wav";
+        //String path1 = getClass().getResource(path).getPath();
+        //Media media = new Media(new File(path1).toURI().toString());
+        //MediaPlayer mediaPlayer = new MediaPlayer(media);
+        //mediaPlayer.play();
+        
+    	//Media sound = new Media(path);
+    	//Media sound = new Media(getClass().getResource(path).toExternalForm());
+    	//MediaPlayer mediaPlayer = new MediaPlayer(sound);
+    	//mediaPlayer.play();
+    	
+    	//String Path = getClass().getResource(path).getPath();
+        //Media media = new Media(new File(Path).toURI().toString());
+        //mediaPlayer = new MediaPlayer(media);
+        //mediaPlayer.play();
+        
+        //this.path = path;
+        //File file = new File(path);
+        //Media sound = new Media(new File(path));
+        //MediaPlayer mediaPlayer = new MediaPlayer(sound);
+        //mediaPlayer.play();
+    	
+    	//AudioClip sound1 = new AudioClip(path);
+    	//sound1.play();
+    }
+
+    public void playsound() {
+        // Run the sound playing task on the JavaFX Application Thread
+        Platform.runLater(() -> {
+            if (playSound) {
+                mediaPlayer.stop();  // Stop any currently playing media
+                mediaPlayer.play();  // Play the new media
+                playSound = false;
+            }
+        });
+    }
+
+    // Sets playSound to true and calls play method
+    public void triggerPlay() {
+        playSound = true;
+        playsound();
+    }
+    
+}
+
