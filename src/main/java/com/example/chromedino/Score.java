@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import misc.SoundManager;
 import static com.example.chromedino.HelloApplication.SCREEN_WIDTH;
 import static com.example.chromedino.HelloApplication.SCREEN_HEIGHT;
 
@@ -38,6 +39,7 @@ public class Score {
     private File scoreFile;
     private Image hi;
     private Image numbers;
+    private SoundManager scoreUpSound;
 
     private double score;
     private int hiScore;
@@ -45,14 +47,18 @@ public class Score {
     public Score() {
         score = 0;
         scoreFileName = "pr.txt";
-        scoreFile = new File("resources/" + scoreFileName);
+        scoreFile = new File(scoreFileName);
         readScore();
         hi = new Image("hi.png");
         numbers = new Image("numbers.png");
+        scoreUpSound = new SoundManager("src/main/resources/scoreup.wav");
     }
 
     //increment score
     public void scoreUp() {
+        if ((int) score != 0 && score % 100 <= 0.1) {
+            scoreUpSound.triggerPlay();
+        }
         score += SCORE_INC;
     }
 

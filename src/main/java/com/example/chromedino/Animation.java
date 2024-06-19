@@ -13,26 +13,27 @@ public class Animation {
     private List<Image> sprites;
     private int currentSpriteIndex = 0;
     private Timeline animationTimeline;
+    private long lastUpdateTime;
+    private int updateTimeMillis;
 
     public Animation(int updateTimeMillis) {
-        sprites = new ArrayList<>();
-        animationTimeline = new Timeline(new KeyFrame(Duration.millis(updateTimeMillis), e -> updateSprite()));
-        animationTimeline.setCycleCount(Timeline.INDEFINITE);
-    }
-
-    // Starts the animation
-    public void start() {
-        animationTimeline.play();
-    }
-
-    // Stops the animation
-    public void stop() {
-        animationTimeline.stop();
+        //sprites = new ArrayList<>();
+        //animationTimeline = new Timeline(new KeyFrame(Duration.millis(updateTimeMillis), e -> updateSprite()));
+        //animationTimeline.setCycleCount(Timeline.INDEFINITE);
+        this.sprites = new ArrayList<>();
+        this.currentSpriteIndex = 0;
+        this.lastUpdateTime = System.nanoTime(); // Store time in nanoseconds for higher precision
+        this.updateTimeMillis = updateTimeMillis;
     }
 
     public void updateSprite() {
-        if (!sprites.isEmpty()) {
+        long now = System.nanoTime();
+        long elapsedTimeMillis = (now - lastUpdateTime) / 1_000_000; // Convert nanoseconds to milliseconds
+        System.out.println(elapsedTimeMillis);
+
+        if (elapsedTimeMillis >= updateTimeMillis) {
             currentSpriteIndex = (currentSpriteIndex + 1) % sprites.size();
+            lastUpdateTime = now;
         }
     }
 

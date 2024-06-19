@@ -24,9 +24,11 @@ import static com.example.chromedino.HelloApplication.SCREEN_HEIGHT;
 public class SkinManager {
 
     private Image[] skins;
+    private Image[] skinNames;
     private double[] skinWidths;
     private double[] skinXPositions;
     public boolean skinselected = false;
+    private int hoveredSkinIndex = -1;
 
     public SkinManager() {
         // Initialize skins
@@ -39,6 +41,16 @@ public class SkinManager {
                 new Image("dino-girl-jump.png"),
                 new Image("dino-granny-jump.png"),
                 new Image("dino-green-jump.png")
+        };
+        skinNames = new Image[]{
+                new Image("default.png"),
+                new Image("work.png"),
+                new Image("viking.png"),
+                new Image("gentleman.png"),
+                new Image("missdino.png"),
+                new Image("girly.png"),
+                new Image("granny.png"),
+                new Image("green.png"),
         };
 
         skinWidths = new double[skins.length];
@@ -65,6 +77,11 @@ public class SkinManager {
     public void drawSkins(GraphicsContext gc) {
         double y = 150; // Change y as needed
         for (int i = 0; i < skins.length; i++) {
+            if (i == hoveredSkinIndex) {
+                gc.setFill(Color.LIGHTGRAY); // Set the color for the hover effect
+                gc.fillRect(skinXPositions[i], y, skinWidths[i], skins[i].getHeight());
+                gc.drawImage(skinNames[i], skinXPositions[i], y - 25, 100, 20);
+            }
             gc.drawImage(skins[i], skinXPositions[i], y);
         }
     }
@@ -76,13 +93,34 @@ public class SkinManager {
         for (int i = 0; i < skins.length; i++) {
             double skinX = skinXPositions[i];
             double skinY = 150; // Assuming all skins are placed at y = 0
-            System.out.println(clickX + " " + clickY);
+            //System.out.println(clickX + " " + clickY);
             if (clickX >= skinX && clickX <= (skinX + skinWidths[i]) && clickY >= skinY && clickY <= (skinY + skins[i].getHeight()) && !skinselected) {
                 setDinoImages(dino, i);
                 System.out.println("Skin " + (i + 1) + " selected!");
                 skinselected = true;
                 break;
             }
+        }
+    }
+
+    public void handleMouseMoved(MouseEvent event) {
+        double mouseX = event.getX();
+        double mouseY = event.getY();
+        boolean hovered = false;
+
+        for (int i = 0; i < skins.length; i++) {
+            double skinX = skinXPositions[i];
+            double skinY = 150; // Assuming all skins are placed at y = 150
+            if (mouseX >= skinX && mouseX <= (skinX + skinWidths[i]) && mouseY >= skinY && mouseY <= (skinY + skins[i].getHeight())) {
+                //System.out.println("mouse hovered at " + mouseX + " " + mouseY);
+                hoveredSkinIndex = i;
+                hovered = true;
+                break;
+            }
+        }
+
+        if (!hovered) {
+            hoveredSkinIndex = -1;
         }
     }
 
@@ -101,7 +139,6 @@ public class SkinManager {
         }
 
         dino.setDinoJumpImage(skinPrefix + "-jump.png");
-        System.out.println(skinPrefix + "-jump.png");
         dino.setDinoRun1Image(skinPrefix + "-run-1.png");
         dino.setDinoRun2Image(skinPrefix + "-run-2.png");
         dino.setDinoDownRun1Image(skinPrefix + "-down-run-1.png");

@@ -1,16 +1,12 @@
 package UserInterface;
 
-import com.example.chromedino.Birds;
-import com.example.chromedino.Cactuses;
 import com.example.chromedino.Clouds;
 import com.example.chromedino.Dino;
 import com.example.chromedino.Land;
-import javafx.scene.control.Skin;
 import javafx.scene.input.MouseEvent;
 import misc.SkinManager;
 
 import javafx.animation.AnimationTimer;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.canvas.Canvas;
@@ -18,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import misc.*;
 import com.example.chromedino.Score;
+import misc.SoundManager;
 
 import static com.example.chromedino.HelloApplication.SCREEN_WIDTH;
 import static com.example.chromedino.HelloApplication.SCREEN_HEIGHT;
@@ -39,7 +36,7 @@ public class GameScreen extends Canvas {
     private GameState gameState = GameState.GAME_SKIN;
     private int introCountdown = 1000;
     private boolean introJump = true;
-    private boolean showHitBoxes = true;
+    private boolean showHitBoxes = false;
     private boolean collisions = true;
 
     private Controls controls;
@@ -51,6 +48,11 @@ public class GameScreen extends Canvas {
     private EnemyManager eManager;
     private ControlManager cManager;
     private SkinManager sManager;
+    private SoundManager chooseSkinSound;
+    private SoundManager inGameSound;
+    private SoundManager gameOverSound;
+
+    private boolean inGameSoundInitialized = false;
 
     public GameScreen(Scene scene, GraphicsContext gc){
         super(scene.getWidth(), scene.getHeight());
@@ -63,8 +65,9 @@ public class GameScreen extends Canvas {
         cManager = new ControlManager(controls, this);
         eManager = new EnemyManager();
         sManager = new SkinManager();
-
-        System.out.println(gameState);
+        chooseSkinSound = new SoundManager("src/main/resources/A Lonely Cherry Tree.mp3");
+        gameOverSound = new SoundManager("src/main/resources/dead.wav");
+        //System.out.println(gameState);
 
         new AnimationTimer() {
             @Override
@@ -77,6 +80,9 @@ public class GameScreen extends Canvas {
         scene.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             sManager.handleMouseClick(event, dino);
         });
+        scene.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+            sManager.handleMouseMoved(event);
+        });
     }
     private void update(){
         //System.out.println(gameState);
@@ -84,11 +90,17 @@ public class GameScreen extends Canvas {
         cManager.update();
         switch(gameState){
             case GAME_INTRO:
+                chooseSkinSound.triggerPlay();
                 dino.updateMovement();
                 if(!introJump && dino.getDinoState() == DinoState.DINO_RUN) land.update();
                 clouds.updatePosition();
                 introCountdown += SpeedX;
-                System.out.println(introCountdown);
+                //System.out.println(introCountdown);
+                if (!inGameSoundInitialized){
+                    inGameSound = new SoundManager("src/main/resources/Run As Fast As You Can.mp3");
+                    inGameSound.triggerPlay();
+                    inGameSoundInitialized = true;
+                }
                 if(introCountdown <= 0) gameState = GameState.GAME_IN_PROGRESS;
                 if(introJump){
                     dino.jump();
@@ -97,6 +109,7 @@ public class GameScreen extends Canvas {
                 }
                 break;
             case GAME_IN_PROGRESS:
+                chooseSkinSound.stop();
                 SpeedX += DIFFICULTY_INC;
                 dino.updateMovement();
                 land.update();
@@ -106,7 +119,9 @@ public class GameScreen extends Canvas {
                     gameState = GameState.GAME_OVER;
                     dino.dinoGameOver();
                     score.writeScore();
-                    //gameOverSound.play();
+                    inGameSound.stop();
+                    inGameSoundInitialized = false;
+                    gameOverSound.triggerPlay();
                 }
                 score.scoreUp();
                 break;
@@ -148,25 +163,51 @@ public class GameScreen extends Canvas {
         dino.drawHitBox(gc);
     }
 
+    private double centerX(Image image){
+        return (SCREEN_WIDTH - image.getWidth()) / 2;
+    }
+
+    private double centerY(Image image){
+        return (SCREEN_HEIGHT - image.getHeight()) / 2;
+    }
+
     private void SkinScreen(GraphicsContext gc){
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-        land.render(gc);
+        Image skinImage = new Image("choose.png");
+        Image introEnhancedImage = new Image("enhanced.png");
+        Image authorsImage = new Image("authors.png");
+        Image javafx = new Image("javafx.png");
+        Image cactus5 = new Image("cactus-5.png");
+        Image cactus8 =  new Image("cactus-8.png");
+        double centerX1 = (SCREEN_WIDTH - skinImage.getWidth()/2) / 2.0;
+        double centerY1 = ((SCREEN_HEIGHT - skinImage.getHeight()/2) / 2.0) - 75;
+
+        double centerX2 = centerX(introEnhancedImage);
+        double centerY2 = centerY(introEnhancedImage) - 110;
+        gc.drawImage(skinImage, centerX1, centerY1, skinImage.getWidth()/2, skinImage.getHeight()/2);
+        gc.drawImage(introEnhancedImage, centerX2, centerY2);
+        gc.drawImage(authorsImage, 0, 5, authorsImage.getWidth()/3, authorsImage.getHeight()/3);
+        gc.drawImage(javafx, 1050, 5, javafx.getWidth()/3, javafx.getHeight()/3);
+        gc.drawImage(cactus8, 50 , 250 - cactus8.getHeight());
+        gc.drawImage(cactus5, 1100, 250 - cactus5.getHeight());
+        clouds.updatePosition();
         clouds.draw(gc);
+        land.render(gc);
         sManager.drawSkins(gc);
         if(sManager.SkinSelected()) gameState = GameState.GAME_START;
     }
     private void startScreen(GraphicsContext gc) {
-        System.out.println("Start Screen");
+        //System.out.println("Start Screen");
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         // Draw land
         land.render(gc);
 
         // Reset and draw dino
-        dino.resetDino();
         dino.draw();
-
+        clouds.updatePosition();
+        clouds.draw(gc);
         // Load intro image
         Image introImage = new Image("intro-text.png");
 
@@ -189,7 +230,6 @@ public class GameScreen extends Canvas {
     }
 
     private void inProgressScreen(GraphicsContext gc) {
-        System.out.println("In Progress Screen");
         clouds.draw(gc);
         land.render(gc);
         eManager.draw(gc);
@@ -200,8 +240,10 @@ public class GameScreen extends Canvas {
     }
 
     private void gameOverScreen(GraphicsContext gc) {
-        // Draw in-progress screen elements (assuming inProgressScreen(g) handles this)
-        inProgressScreen(gc);
+        clouds.draw(gc);
+        dino.draw();
+        eManager.draw(gc);
+        land.render(gc);
 
         // Load game over and replay images
         Image gameOverImage = new Image("game-over.png");
@@ -219,20 +261,23 @@ public class GameScreen extends Canvas {
     }
 
     private void pausedScreen(GraphicsContext gc) {
-        // Draw in-progress screen elements (assuming inProgressScreen(gc) handles this)
-        inProgressScreen(gc);
+        clouds.draw(gc);
+        land.render(gc);
+        dino.draw();
+        eManager.draw(gc);
 
         // Load paused image
-        Image pausedImage = new Image("resources/paused.png");
+        Image pausedImage = new Image("paused.png");
 
         // Draw paused image centered above center
         double pausedX = (SCREEN_WIDTH - pausedImage.getWidth()) / 2.0;
         double pausedY = SCREEN_HEIGHT / 2.0 - pausedImage.getHeight();
         gc.drawImage(pausedImage, pausedX, pausedY);
+
     }
 
     public void pressUpAction(){
-        System.out.println("Pressed up!");
+        //System.out.println("Pressed up!");
         if(gameState == GameState.GAME_IN_PROGRESS){
             dino.jump();
             dino.setDinoState(DinoState.DINO_JUMP);
@@ -283,9 +328,13 @@ public class GameScreen extends Canvas {
     }
 
     public void pressPauseAction() {
-        if(gameState == GameState.GAME_IN_PROGRESS)
+        if(gameState == GameState.GAME_IN_PROGRESS) {
             gameState = GameState.GAME_PAUSED;
-        else
+            inGameSound.pause();
+        }
+        else {
             gameState = GameState.GAME_IN_PROGRESS;
+            inGameSound.resume();
+        }
     }
 }

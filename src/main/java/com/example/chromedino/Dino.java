@@ -8,13 +8,14 @@ import javafx.scene.paint.Color;
 import misc.Controls;
 import misc.Animation;
 import misc.DinoState;
+import misc.SoundManager;
 
 public class Dino {
     //Hitboxes for dino
     private static final int[] HITBOX_RUN = {19, 90, -32, -42};
     private static final int[] HITBOX_DOWN_RUN = {24, 55, 5, -25};
     public static final double X = 120;
-    private double y = 0;
+    public double y = 0;
 
     private static final double GROUND_DINO = 250;
     private static final double GROUND_Y = 280;
@@ -27,10 +28,11 @@ public class Dino {
     private Animation dinoRun;
     private Animation dinoDownRun;
 
-    private double dinoY = GROUND_DINO;
+    public double dinoY = GROUND_DINO;
     private double speedY = 0;
     private boolean isJumping = false;
     private DinoState currentState;
+    private SoundManager jumpSound;
 
     private Image dinojump;
     private Image dinorun1;
@@ -47,13 +49,15 @@ public class Dino {
         this.gc = gc;
 
         // Initialize dinoRun animation
-        dinoRun = new Animation(5); // 150 milliseconds for each frame
+        dinoRun = new Animation(150); // 150 milliseconds for each frame
 
         // Initialize dinoDownRun animation
-        dinoDownRun = new Animation(5);
+        dinoDownRun = new Animation(150);
 
         //Initialize dino at jump state
         currentState = DinoState.DINO_JUMP;
+
+        jumpSound = new SoundManager("src/main/resources/jump.wav");
     }
 
     public DinoState getDinoState(){
@@ -88,6 +92,7 @@ public class Dino {
         }
 
         if (controls.isPressedUp() && !isJumping) {
+            jumpSound.triggerPlay();
             isJumping = true;
             currentState = DinoState.DINO_JUMP;
             speedY = SPEED_Y;
@@ -121,7 +126,7 @@ public class Dino {
 
     public void setDinoJumpImage(String DinoJump) {
         dinojump = new Image(DinoJump);
-        System.out.println(DinoJump);
+        //System.out.println(DinoJump);
     }
 
     public void setDinoRun1Image(String DinoRun1) {
@@ -151,7 +156,7 @@ public class Dino {
     }
 
     public Image getDinoJumpImage(){
-        System.out.println(dinojump);
+        //System.out.println(dinojump);
         return dinojump;
     }
 
@@ -198,7 +203,7 @@ public class Dino {
             default:
                 break;
         }
-        System.out.println(currentDinoImage);
+        //System.out.println(currentDinoImage);
         if (currentDinoImage != null) {
             gc.drawImage(currentDinoImage, 100, dinoY - currentDinoImage.getHeight()); // Adjust position as needed
         }
@@ -223,6 +228,9 @@ public class Dino {
 
     public void resetDino() {
         y = GROUND_Y - dinojump.getHeight();
+        //System.out.println(GROUND_Y + " " + dinojump.getHeight());
+        dinoY = GROUND_DINO;
+        isJumping = false;
         currentState = DinoState.DINO_RUN;
     }
 

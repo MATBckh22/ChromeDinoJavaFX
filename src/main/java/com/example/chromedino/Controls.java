@@ -8,6 +8,7 @@ public class Controls {
 
     private boolean isPressedUp = false;
     private boolean isPressedDown = false;
+    private boolean isPaused = false;
 
     public Controls(Scene scene) {
         scene.setOnKeyPressed(this::handleKeyPressed);
@@ -16,9 +17,12 @@ public class Controls {
 
     private void handleKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.W || event.getCode() == KeyCode.SPACE) {
+            System.out.println("up initiated");
             isPressedUp = true;
         } else if (event.getCode() == KeyCode.DOWN || event.getCode() == KeyCode.S) {
             isPressedDown = true;
+        } else if (event.getCode() == KeyCode.ESCAPE) {
+            isPaused = true;
         }
     }
 
@@ -27,6 +31,8 @@ public class Controls {
             isPressedUp = false;
         } else if (event.getCode() == KeyCode.DOWN || event.getCode() == KeyCode.S) {
             isPressedDown = false;
+        } else if(event.getCode() == KeyCode.ESCAPE) {
+            isPaused = false;
         }
     }
 
@@ -37,4 +43,6 @@ public class Controls {
     public boolean isPressedDown() {
         return isPressedDown;
     }
+
+    public boolean isPaused() { return isPaused; }
 }
