@@ -7,7 +7,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import static com.example.chromedino.HelloApplication.*;
+import static com.example.chromedino.GameStage.*;
+
+/**
+ * Clouds class manages the spawning and rendering of clouds
+ */
 
 public class Clouds {
 
@@ -25,6 +29,7 @@ public class Clouds {
     }
 
     private static final int CLOUDS_AMOUNT = 5;
+    //0.5 percentage for a cloud to spawn
     private static final double CLOUD_PERCENTAGE = 0.5;
     private Set<Cloud> clouds;
     private int cloudwidthscaled;
@@ -38,11 +43,13 @@ public class Clouds {
         cloudheightscaled = (int) (new Image("cloud.png").getHeight() * 2);
     }
 
+    //updates cloud position, basically redrawing every update
     public void updatePosition() {
         isOutofScreen();
         createClouds();
     }
 
+    //check if a cloud is out of screen
     public void isOutofScreen() {
         for (Iterator<Cloud> i = clouds.iterator(); i.hasNext(); ) {
             Cloud cloud = i.next();
@@ -51,6 +58,7 @@ public class Clouds {
         }
     }
 
+    //creates clouds of random y positions
     private void createClouds() {
         if (clouds.size() < CLOUDS_AMOUNT) {
             for (Cloud cloud : clouds) {

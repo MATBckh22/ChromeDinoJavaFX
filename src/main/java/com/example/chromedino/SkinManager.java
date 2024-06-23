@@ -1,25 +1,20 @@
 package misc;
 
-import com.example.chromedino.Birds;
-import com.example.chromedino.Cactuses;
-import com.example.chromedino.Clouds;
 import com.example.chromedino.Dino;
-import com.example.chromedino.Land;
+
 import javafx.scene.input.MouseEvent;
-import javafx.scene.Node;
-import javafx.animation.AnimationTimer;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import misc.*;
-import com.example.chromedino.Score;
-import UserInterface.GameScreen;
 
-import static com.example.chromedino.HelloApplication.SCREEN_WIDTH;
-import static com.example.chromedino.HelloApplication.SCREEN_HEIGHT;
+import static com.example.chromedino.GameStage.SCREEN_WIDTH;
+
+/*
+* SkinManager handles the skinScreen in GameScreen, which is the first screen of the game.
+* This class loads all the skins into the game and prompts the player to select a skin.
+* Each skin name will show up when the player's cursor hovers onto the corresponding skin.
+* Once a skin is selected, skinselected becomes false and goes to the next screen.
+*/
 
 public class SkinManager {
 
@@ -31,7 +26,7 @@ public class SkinManager {
     private int hoveredSkinIndex = -1;
 
     public SkinManager() {
-        // Initialize skins
+        //Initialize skins
         skins = new Image[]{
                 new Image("dino-jump.png"),
                 new Image("dino-work-jump.png"),
@@ -42,6 +37,7 @@ public class SkinManager {
                 new Image("dino-granny-jump.png"),
                 new Image("dino-green-jump.png")
         };
+        //Initialize skin names
         skinNames = new Image[]{
                 new Image("default.png"),
                 new Image("work.png"),
@@ -59,6 +55,7 @@ public class SkinManager {
         calculateSkinPositions();
     }
 
+    //calculates x positions for 8 buttons
     private void calculateSkinPositions() {
         double totalWidth = 0;
         for (Image skin : skins) {
@@ -75,17 +72,19 @@ public class SkinManager {
     }
 
     public void drawSkins(GraphicsContext gc) {
-        double y = 150; // Change y as needed
+        double y = 150;
         for (int i = 0; i < skins.length; i++) {
             if (i == hoveredSkinIndex) {
-                gc.setFill(Color.LIGHTGRAY); // Set the color for the hover effect
+                gc.setFill(Color.LIGHTGRAY); //set light grey for the hover effect
                 gc.fillRect(skinXPositions[i], y, skinWidths[i], skins[i].getHeight());
                 gc.drawImage(skinNames[i], skinXPositions[i], y - 25, 100, 20);
             }
+            //draws all skins
             gc.drawImage(skins[i], skinXPositions[i], y);
         }
     }
 
+    //handles when the button is right-clicked
     public void handleMouseClick(MouseEvent event, Dino dino) {
         double clickX = event.getX();
         double clickY = event.getY();
@@ -94,15 +93,17 @@ public class SkinManager {
             double skinX = skinXPositions[i];
             double skinY = 150; // Assuming all skins are placed at y = 0
             //System.out.println(clickX + " " + clickY);
+            //calculates the click area of the button
             if (clickX >= skinX && clickX <= (skinX + skinWidths[i]) && clickY >= skinY && clickY <= (skinY + skins[i].getHeight()) && !skinselected) {
                 setDinoImages(dino, i);
-                System.out.println("Skin " + (i + 1) + " selected!");
+                //System.out.println("Skin " + (i + 1) + " selected!");
                 skinselected = true;
                 break;
             }
         }
     }
 
+    //handles when the cursor hovers over the button
     public void handleMouseMoved(MouseEvent event) {
         double mouseX = event.getX();
         double mouseY = event.getY();
@@ -110,7 +111,8 @@ public class SkinManager {
 
         for (int i = 0; i < skins.length; i++) {
             double skinX = skinXPositions[i];
-            double skinY = 150; // Assuming all skins are placed at y = 150
+            double skinY = 150;
+            //calculates the hover area of the button
             if (mouseX >= skinX && mouseX <= (skinX + skinWidths[i]) && mouseY >= skinY && mouseY <= (skinY + skins[i].getHeight())) {
                 //System.out.println("mouse hovered at " + mouseX + " " + mouseY);
                 hoveredSkinIndex = i;
@@ -124,6 +126,7 @@ public class SkinManager {
         }
     }
 
+    //when the player selects a skin, all of its corresponding dino states are passed to dino
     private void setDinoImages(Dino dino, int skinIndex) {
         String skinPrefix = "";
         switch (skinIndex) {
@@ -146,6 +149,7 @@ public class SkinManager {
         dino.setDinoDeadImage(skinPrefix + "-dead.png");
     }
 
+    //boolean method to track if a skin is selected
     public boolean SkinSelected(){
         return skinselected;
     }

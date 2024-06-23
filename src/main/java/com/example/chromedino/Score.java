@@ -1,6 +1,6 @@
 package com.example.chromedino;
 
-import UserInterface.GameScreen;
+import UserInterface.GameScene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -17,24 +17,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import misc.SoundManager;
-import static com.example.chromedino.HelloApplication.SCREEN_WIDTH;
-import static com.example.chromedino.HelloApplication.SCREEN_HEIGHT;
+import static com.example.chromedino.GameStage.SCREEN_WIDTH;
+import static com.example.chromedino.GameStage.SCREEN_HEIGHT;
+
+/**
+ * handles the scoring system of the game and writes high scores into a txt file
+ */
 
 public class Score {
-    // value by which score is increasing
+    //increment of score
     private static final double SCORE_INC = 0.1;
-    // length of score on screen, max 99999 but i dont think that anyone will play that long so.....
     private static final int SCORE_LENGTH = 5;
-    // width and height of single number on sprite
     private static final int NUMBER_WIDTH = 20;
     private static final int NUMBER_HEIGHT = 21;
-    // here i calculate position of score on screen
     private static final int CURRENT_SCORE_X = SCREEN_WIDTH - (SCORE_LENGTH * NUMBER_WIDTH + SCREEN_WIDTH / 100);
     private static final int HI_SCORE_X = SCREEN_WIDTH - (SCORE_LENGTH * NUMBER_WIDTH + SCREEN_WIDTH / 100) * 2;
     private static final int HI_X = SCREEN_WIDTH - ((SCORE_LENGTH * NUMBER_WIDTH + SCREEN_WIDTH / 100) * 2 + NUMBER_WIDTH * 2 + SCREEN_WIDTH / 100);
     private static final int SCORE_Y = SCREEN_HEIGHT / 25;
 
-    private GameScreen gameScreen;
+    private GameScene GameScene;
     private String scoreFileName;
     private File scoreFile;
     private Image hi;
@@ -77,6 +78,7 @@ public class Score {
         return scoreArray;
     }
 
+    //writing score method
     public void writeScore() {
         if (score > hiScore) {
             File file = scoreFile;
@@ -89,6 +91,7 @@ public class Score {
         }
     }
 
+    //reading score method
     private void readScore() {
         if (scoreFile.exists()) {
             String line;
@@ -109,6 +112,7 @@ public class Score {
         }
     }
 
+    //reset high score
     public void scoreReset(){
         if (score > hiScore){
             hiScore = (int) score;
@@ -116,6 +120,7 @@ public class Score {
         score = 0;
     }
 
+    //renders the score by cropping the score image with equal lengths
     public void draw(GraphicsContext gc){
         int[] scoreArray = scoreToArray(score);
         for (int i = 0; i < SCORE_LENGTH; i++){

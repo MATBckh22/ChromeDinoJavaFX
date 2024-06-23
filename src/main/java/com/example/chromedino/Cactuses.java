@@ -6,14 +6,18 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import misc.EnemyManager;
-import com.example.chromedino.HelloApplication;
+import com.example.chromedino.GameStage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import static com.example.chromedino.HelloApplication.SCREEN_WIDTH;
+import static com.example.chromedino.GameStage.SCREEN_WIDTH;
+
+/**
+ * Cactus class handles the spawning and hitbox drawing of cactus
+ */
 
 public class Cactuses {
 
@@ -31,8 +35,11 @@ public class Cactuses {
         }
     }
 
+    //9 images, therefore 9 cactuses
     private static final int CACTUS_AMOUNT = 9;
+    //maximum group of cactuses to spawn as one
     private static final int MAX_CACTUS_GROUP = 3;
+    //extra spaces to deduct from hitbox calculations
     private static final double HITBOX_X = 2.7;
     private static final int HITBOX_Y = 25;
 
@@ -48,6 +55,7 @@ public class Cactuses {
         random = new Random();
     }
 
+    //updates position for cactus
     public void updatePosition() {
         //System.out.println("Updating Position");
         for (Iterator<Cactus> i = cactuses.iterator(); i.hasNext(); ) {
@@ -57,25 +65,28 @@ public class Cactuses {
         }
     }
 
+    //check if there's any space to spawn a cactus
     public boolean spaceAvailable() {
         //System.out.println("Checking for space");
         if (cactuses.isEmpty()) {
             return true;
         }
         Cactus lastCactus = cactuses.get(cactuses.size() - 1);
-        return HelloApplication.SCREEN_WIDTH - (
+        return GameStage.SCREEN_WIDTH - (
                 lastCactus.x + lastCactus.cactusimage.getWidth())
                 > eManager.getDistanceBetweenEnemies(); //distance between cactuses
     }
 
+    //spawns cactus
     public boolean createCactuses() {
-        //generate probability of cactuses spawning to be less than 10% for each
+        //generate probability of cactuses spawning, handled by EnemyManager
         if (Math.random() * 100 < eManager.getCactusesPercentage()) {
             int numberofCactuses = (int) (Math.random() * MAX_CACTUS_GROUP + 1);
             for (int i = 0; i < numberofCactuses; i++) {
                 Image cactusimage = new Image("cactus-" + (random.nextInt(CACTUS_AMOUNT) + 1) + ".png");
                 int x = SCREEN_WIDTH;
                 int y = (int) (250 - cactusimage.getHeight());
+                //Image handling
                 if (i > 0) {
                     Cactus lastCactus = cactuses.get(cactuses.size() - 1);
                     x = (int) (lastCactus.x + lastCactus.cactusimage.getWidth());
@@ -87,7 +98,8 @@ public class Cactuses {
         return false;
     }
 
-    public boolean iscollision(Bounds dinoHitBox) {
+    //detects collision by checking if an intersection between dino's hitbox and cactus occurs
+    public boolean collisiondetector(Bounds dinoHitBox) {
         for (Cactus cactus : cactuses) {
             Bounds cactusHitBox = getHitBox(cactus);
             if (cactusHitBox.intersects(dinoHitBox)) {
@@ -99,9 +111,7 @@ public class Cactuses {
     }
 
     private Bounds getHitBox(Cactus cactus) {
-        // weird calculation but its working as needed
-        // basically i make it thinner from left and right and shorter to match it perfectly
-        // enable hitboxes in GameScreen to see it
+        //enable hitboxes in GameScene to see it
         return new BoundingBox(
                 cactus.x + (cactus.cactusimage.getWidth() / HITBOX_X),
                 cactus.y + (cactus.cactusimage.getHeight() / HITBOX_Y),
@@ -110,6 +120,7 @@ public class Cactuses {
         );
     }
 
+    //clears cactuses
     public void clearCactuses() {
         cactuses.clear();
     }
@@ -120,6 +131,7 @@ public class Cactuses {
         }
     }
 
+    //draws hitboxes for debug mode
     public void drawHitBox(GraphicsContext gc) {
         gc.setStroke(Color.RED);
         gc.setLineWidth(1);
